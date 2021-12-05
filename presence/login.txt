@@ -1,0 +1,93 @@
+// FONCTION PERMETTANT DE CONNECTER UN CLIENT
+
+  Future connecterClient() async{
+    setState(() {
+      visible = true;
+      info = '';
+    });
+
+    var datas = {'email': _emailogin.text, 'pass': _passlogin.text};
+
+    final url2 = Uri.parse("https://geeksp3.com/tialao/emaraichers/admin/traitements/loginclient.php");
+    var response = await http.post(url2, body: json.encode(datas));
+
+
+    if (response.statusCode == 200) {
+
+      var data = jsonDecode(response.body);
+      var resultat = data['data'];
+      String message = resultat[0];
+      int success = resultat[1];
+      // var idClient = resultat[2]['id'];
+      
+
+      // // print(data);
+      // print('success = $success');
+      // print('idClient = $idClient');
+      // print(resultat[2]['nom']);
+      //  print(resultat[2]['prenom']);
+      //  print(resultat[2]['statuscompte']);
+
+      if(success == 1){
+        print("trouvé");
+
+        if(success == 1){
+          setState(() {
+            visible = false;
+            info = message;
+          });
+          showToast3(info, duration: 2);
+
+          int id = resultat[2]['id'];
+          String nom = resultat[2]['nom'];
+          String prenom  = resultat[2]['prenom'];
+          String nomPrenom = '$nom $prenom';
+          String email = resultat[2]['email'];
+          String photo = resultat[2]['photo'];
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Accueil(
+                      id: id,
+                      email: email,
+                      nomprenom: nomPrenom,
+                      photo: photo
+                    )));
+
+          print(resultat[2]['id']);
+          print(resultat[2]['nom']);
+          print(resultat[2]['prenom']);
+          print(resultat[2]['email']);
+          print(resultat[2]['photo']);
+
+        }
+        if(success == 2){
+
+          setState(() {
+            visible = false;
+            info = message;
+          });
+              
+          showToast(info, duration: 5);
+
+          print("Désolé, votre compte n'est pas encore activé, Veuillez patientez");
+
+          }
+
+      }else{
+
+        setState(() {
+          visible = false;
+          info = message;
+        });
+            
+        showToast(info, duration: 5);
+
+        print("Email ou Mot de passe incorrecte");
+
+      }
+
+    }
+
+  }
